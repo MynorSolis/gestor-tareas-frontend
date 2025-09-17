@@ -42,9 +42,9 @@ testem.log
 Thumbs.db
 
 # Archivos de entorno (AGREGAR ESTAS LÍNEAS)
-/src/environments/environment.ts
+#/src/environments/environment.ts
 /src/environments/environment.prod.ts
 .env
-#.env.local
+.env.local
 .env.production
 *.env
