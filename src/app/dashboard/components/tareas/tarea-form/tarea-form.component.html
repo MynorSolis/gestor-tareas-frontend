@@ -1,0 +1,142 @@
+<div class="dashboard-container">
+
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">
+      {{ isEditMode ? 'Editar Tarea' : 'Crear Nueva Tarea' }}
+    </h1>
+    <p class="dashboard-subtitle">
+      Completa el formulario para {{ isEditMode ? 'editar' : 'crear' }} una tarea
+    </p>
+  </div>
+
+
+  <div class="form-card">
+    <form [formGroup]="tareaForm" (ngSubmit)="onSubmit()">
+      <div class="form-section">
+        <h2 class="section-title">Información Básica</h2>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="titulo" class="form-label">Título *</label>
+              <input 
+                type="text" 
+                id="titulo" 
+                formControlName="titulo"
+                class="form-control"
+                placeholder="Título de la tarea"
+                [ngClass]="{ 'is-invalid': tareaForm.get('titulo')?.invalid && tareaForm.get('titulo')?.touched }">
+              <div *ngIf="tareaForm.get('titulo')?.invalid && tareaForm.get('titulo')?.touched" class="invalid-feedback">
+                Título es requerido
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="proyectoId" class="form-label">Proyecto *</label>
+              <select 
+                id="proyectoId" 
+                formControlName="proyectoId"
+                class="form-select"
+                [ngClass]="{ 'is-invalid': tareaForm.get('proyectoId')?.invalid && tareaForm.get('proyectoId')?.touched }">
+                <option value="">Selecciona un proyecto</option>
+                <option *ngFor="let proyecto of proyectos" [value]="proyecto.id">{{ proyecto.nombre }}</option>
+              </select>
+              <div *ngIf="tareaForm.get('proyectoId')?.invalid && tareaForm.get('proyectoId')?.touched" class="invalid-feedback">
+                Proyecto es requerido
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-group">
+          <label for="descripcion" class="form-label">Descripción</label>
+          <textarea 
+            id="descripcion" 
+            formControlName="descripcion"
+            rows="4"
+            class="form-control"
+            placeholder="Descripción detallada de la tarea"></textarea>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2 class="section-title">Detalles de la Tarea</h2>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="fechaLimite" class="form-label">Fecha Límite *</label>
+              <input 
+                type="date" 
+                id="fechaLimite" 
+                formControlName="fechaLimite"
+                class="form-control"
+                [ngClass]="{ 'is-invalid': tareaForm.get('fechaLimite')?.invalid && tareaForm.get('fechaLimite')?.touched }">
+              <div *ngIf="tareaForm.get('fechaLimite')?.invalid && tareaForm.get('fechaLimite')?.touched" class="invalid-feedback">
+                Fecha límite es requerida
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="prioridad" class="form-label">Prioridad *</label>
+              <select 
+                id="prioridad" 
+                formControlName="prioridad"
+                class="form-select">
+                <option value="Baja">Baja</option>
+                <option value="Media">Media</option>
+                <option value="Alta">Alta</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="usuarioAsignadoId" class="form-label">Asignar a</label>
+              <select 
+                id="usuarioAsignadoId" 
+                formControlName="usuarioAsignadoId"
+                class="form-select">
+                <option value="">No asignar</option>
+                <option *ngFor="let usuario of usuarios" [value]="usuario.id">
+                  {{ usuario.username }}
+                  <span *ngIf="usuario.id === currentUser?.id"> (Yo)</span>
+                </option>
+              </select>
+              <small *ngIf="isEncargado && tareaOriginal?.usuarioAsignadoId === currentUser?.id" class="form-text text-muted">
+                No puedes cambiar la asignación de esta tarea porque estás asignado a ella.
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="button" 
+          (click)="router.navigate(['/dashboard/tareas'])"
+          class="btn btn-outline-secondary">
+          <i-feather name="x" class="feather-sm me-2"></i-feather>
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          [disabled]="tareaForm.invalid || isLoading">
+          <span *ngIf="!isLoading">
+            <i-feather [name]="isEditMode ? 'save' : 'plus'" class="feather-sm me-2"></i-feather>
+            {{ isEditMode ? 'Actualizar' : 'Crear' }} Tarea
+          </span>
+          <span *ngIf="isLoading">
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Guardando...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

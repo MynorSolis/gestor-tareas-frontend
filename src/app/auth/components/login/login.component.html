@@ -1,0 +1,86 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header text-center mb-5">
+      <img class="login-logo" src="assets/logo.png" alt="TaskApp">
+      <h1 class="login-title">TaskApp</h1>
+      <p class="login-subtitle">Inicia sesión en tu cuenta</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group mb-4">
+        <label for="username" class="form-label">Usuario</label>
+        <input
+          id="username"
+          formControlName="username"
+          type="text"
+          class="form-control input-field"
+          [ngClass]="{'is-invalid': (loginForm.get('username')?.invalid && loginForm.get('username')?.touched) || loginError}"
+          placeholder="Ingresa tu usuario"
+          required>
+        <div *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" 
+             class="form-error">
+          <i class="bi bi-exclamation-circle"></i> Nombre de usuario requerido
+        </div>
+      </div>
+      
+      <div class="form-group mb-4">
+        <label for="password" class="form-label">Contraseña</label>
+        <div class="password-input">
+          <input
+            id="password"
+            formControlName="password"
+            [type]="showPassword ? 'text' : 'password'"
+            class="form-control input-field"
+            [ngClass]="{'is-invalid': loginError}"
+            placeholder="Ingresa tu contraseña"
+            required>
+          <button
+            class="password-toggle"
+            type="button"
+            (click)="togglePasswordVisibility()">
+            <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+          </button>
+        </div>
+        <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" 
+            class="form-error">
+          <i class="bi bi-exclamation-circle"></i>
+          <span *ngIf="loginForm.get('password')?.errors?.['required']">Contraseña requerida</span>
+          <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Debe tener al menos 6 caracteres</span>
+        </div>
+        
+        
+        <div *ngIf="loginError" class="form-error">
+          <i class="bi bi-exclamation-circle"></i> {{ loginError }}
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="form-check remember-me">
+          <input class="form-check-input" id="remember-me" type="checkbox">
+          <label class="form-check-label" for="remember-me">Recuérdame</label>
+        </div>
+        <a href="#" class="forgot-password" (click)="openForgotPasswordModal($event)">
+          ¿Olvidaste tu contraseña?
+        </a>
+      </div>
+
+      <button
+        type="submit"
+        class="btn login-btn w-100"
+        [disabled]="loginForm.invalid || isLoading">
+        <span *ngIf="!isLoading">Iniciar sesión</span>
+        <span *ngIf="isLoading">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Cargando...
+        </span>
+      </button>
+    </form>
+
+    <div class="login-footer text-center mt-4">
+      <p class="register-text">
+        ¿No tienes una cuenta? 
+        <a [routerLink]="['/auth/registro']" class="register-link">Regístrate</a>
+      </p>
+    </div>
+  </div>
+</div>

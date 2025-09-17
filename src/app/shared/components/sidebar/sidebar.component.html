@@ -1,0 +1,28 @@
+<div class="sidebar" [class.sidebar-mobile-hidden]="!sidebarVisible">
+  <div class="sidebar-menu">
+    <ul class="sidebar-list">
+      <li *ngFor="let item of filteredMenuItems" class="sidebar-item">
+        <a 
+          [routerLink]="item.route" 
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="isTareasItem(item) || isProyectosItem(item) ? { exact: false } : { exact: true }"
+          class="sidebar-link"
+          (click)="closeSidebarOnMobile()">
+          <span class="sidebar-icon">
+            <i-feather [name]="item.icon" class="feather-sm"></i-feather>
+          </span>
+          <span class="sidebar-text">{{ item.title }}</span>
+          <span class="sidebar-arrow">
+            <i-feather name="chevron-right" class="feather-xs"></i-feather>
+          </span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- Overlay para móviles -->
+<div class="sidebar-overlay" 
+     [class.active]="sidebarVisible" 
+     (click)="toggleSidebar()"
+     *ngIf="isMobileView"></div>

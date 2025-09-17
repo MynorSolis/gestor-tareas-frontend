@@ -1,0 +1,261 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4rem;
+  background: #fff;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  z-index: 1040;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.navbar-container {
+  width: 100%;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo-icon {
+  color: #0d6efd;
+  margin-right: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.logo-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+
+.navbar-user {
+  display: flex;
+  align-items: center;
+}
+
+.user-toggle {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.user-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.025);
+}
+
+.user-avatar {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background-color: #0d6efd;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.user-info {
+  text-align: left;
+  margin-right: 0.75rem;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #2c3e50;
+}
+
+.user-role {
+  font-size: 0.75rem;
+  color: #6c757d;
+  text-transform: capitalize;
+}
+
+.dropdown-arrow {
+  margin-left: 0.5rem;
+  color: #adb5bd;
+  transition: transform 0.2s ease;
+}
+
+.show .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+
+.dropdown-menu {
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0;
+  min-width: 12rem;
+  margin-top: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  position: absolute;
+  right: 0;
+  left: auto;
+  max-height: calc(100vh - 5rem);
+  overflow-y: auto; 
+}
+
+.dropdown-toggle::after {
+  display: none !important;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1.25rem;
+  color: #495057;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+  background-color: #f8f9fa;
+  color: #0d6efd;
+}
+
+.dropdown-item i-feather {
+  color: #6c757d;
+}
+
+.dropdown-item:hover i-feather,
+.dropdown-item:focus i-feather {
+  color: #0d6efd;
+}
+
+.dropdown-divider {
+  margin: 0.5rem 0;
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+
+@media (max-width: 767.98px) {
+  .navbar-container {
+    padding: 0 1rem;
+  }
+  
+  .logo-text {
+    display: none;
+  }
+  
+  .user-info {
+    display: none;
+  }
+  
+  .user-toggle {
+    padding: 0.5rem;
+  }
+}
+
+
+
+.navbar-toggler {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+  color: #6c757d;
+  cursor: pointer;
+  display: none;
+}
+
+.navbar-toggler:hover {
+  color: #0d6efd;
+}
+
+
+@media (max-width: 991.98px) {
+  .navbar-toggler {
+    display: block;
+  }
+  
+  .navbar-container {
+    padding: 0 1rem;
+  }
+  
+  .logo-text {
+    font-size: 1.1rem;
+  }
+  
+  .user-info {
+    display: none;
+  }
+  
+  .user-toggle {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .logo-text {
+    display: none;
+  }
+  
+  .user-avatar {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.8rem;
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .dropdown-menu {
+    position: fixed; 
+    top: 4rem !important; 
+    left: 1rem !important;
+    right: 1rem !important;
+    width: auto !important;
+    max-width: calc(100% - 2rem);
+    min-width: unset;
+    margin-top: 0;
+    transform: none !important;
+  }
+
+  .dropdown-item {
+    padding: 0.75rem 1.25rem; 
+  }
+
+  .navbar-container {
+    position: relative;
+    z-index: 1050; 
+  }
+}
+
+
+@media (max-width: 400px) {
+  .dropdown-menu {
+    left: 0.5rem !important;
+    right: 0.5rem !important;
+    max-width: calc(100% - 1rem);
+  }
+}

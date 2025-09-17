@@ -1,0 +1,127 @@
+<div class="dashboard-container">
+
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">Dashboard</h1>
+    <p class="dashboard-subtitle">Resumen de tu actividad</p>
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="row g-4 mb-4">
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="stat-card bg-gradient-primary">
+        <div class="stat-content">
+          <p class="stat-label">Tareas {{ currentUserRole === 'ROLE_ADMIN' ? 'totales' : 'asignadas' }}</p>
+          <p class="stat-value">{{ estadisticas.tareasTotales }}</p>
+        </div>
+        <div class="stat-icon">
+          <i-feather name="check-circle" class="feather-lg"></i-feather>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="stat-card bg-gradient-success">
+        <div class="stat-content">
+          <p class="stat-label">Completadas</p>
+          <p class="stat-value">{{ estadisticas.tareasCompletadas }}</p>
+        </div>
+        <div class="stat-icon">
+          <i-feather name="check" class="feather-lg"></i-feather>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="stat-card bg-gradient-info">
+        <div class="stat-content">
+          <p class="stat-label">En progreso</p>
+          <p class="stat-value">{{ estadisticas.tareasEnProgreso }}</p>
+        </div>
+        <div class="stat-icon">
+          <i-feather name="clock" class="feather-lg"></i-feather>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="stat-card bg-gradient-warning">
+        <div class="stat-content">
+          <p class="stat-label">Pendientes</p>
+          <p class="stat-value">{{ estadisticas.tareasPendientes }}</p>
+        </div>
+        <div class="stat-icon">
+          <i-feather name="alert-circle" class="feather-lg"></i-feather>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráfico y Tareas Recientes -->
+  <div class="row g-4 mb-5">
+    <div class="col-12 col-lg-5">
+      <div class="chart-card h-100">
+        <div class="card-header">
+          <h2 class="card-title">Distribución de Tareas</h2>
+        </div>
+        <div class="chart-container">
+          <canvas id="tareasChart" width="100%" height="100%"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-7">
+      <div class="recent-tasks-card">
+        <div class="card-header">
+          <h2 class="card-title">Tareas {{ currentUserRole === 'ROLE_ADMIN' ? 'Recientes' : 'Asignadas' }}</h2>
+          <a href="#" class="view-all">Ver todas</a>
+        </div>
+        <div class="task-list">
+          <div *ngFor="let tarea of tareasRecientes" class="task-item">
+            <div class="task-info">
+              <h3 class="task-title">{{ tarea.titulo }}</h3>
+              <p *ngIf="currentUserRole === 'ROLE_ADMIN'" class="task-project">{{ tarea.proyectoNombre }}</p>
+               <span class="task-deadline">{{ tarea.fechaLimite | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="task-meta">
+              <span [ngClass]="{
+                'status-badge': true,
+                'completed': tarea.estado === 'Completada',
+                'in-progress': tarea.estado === 'En progreso',
+                'pending': tarea.estado === 'Pendiente'
+                }">
+                {{ tarea.estado }}
+              </span>
+             
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Proyectos Recientes -->
+  <div *ngIf="currentUserRole !== 'ROLE_USER'" class="mb-5">
+    <div class="projects-card">
+      <div class="card-header">
+        <h2 class="card-title">
+          {{ currentUserRole === 'ROLE_ADMIN' ? 'Proyectos Recientes' : 'Mis Proyectos' }}
+        </h2>
+        <a href="#" class="view-all">Ver todos</a>
+      </div>
+      <div class="project-grid">
+        <div *ngFor="let proyecto of proyectosRecientes" class="project-card">
+          <div class="project-content">
+            <h3 class="project-title">{{ proyecto.nombre }}</h3>
+            <p class="project-description">{{ proyecto.descripcion }}</p>
+            <div class="project-footer">
+              <span class="project-deadline">{{ proyecto.fechaLimite | date:'dd/MM/yyyy' }}</span>
+              <a [routerLink]="['/dashboard/proyectos', proyecto.id]" class="project-link">
+                Ver detalles <i-feather name="arrow-right" class="feather-sm"></i-feather>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

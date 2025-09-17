@@ -1,0 +1,21 @@
+<nav *ngIf="totalPages > 1" aria-label="Paginación" class="pagination-container">
+  <ul class="pagination-list">
+    <li class="pagination-item" [class.disabled]="currentPage === 1">
+      <button class="pagination-button pagination-prev" (click)="changePage(currentPage - 1)" aria-label="Página anterior">
+        <i-feather name="chevron-left" class="feather-sm"></i-feather>
+      </button>
+    </li>
+    
+    <li class="pagination-item" *ngFor="let page of pages" [class.active]="page === currentPage">
+      <button class="pagination-button" (click)="changePage(page)">
+        {{ page }}
+      </button>
+    </li>
+    
+    <li class="pagination-item" [class.disabled]="currentPage === totalPages">
+      <button class="pagination-button pagination-next" (click)="changePage(currentPage + 1)" aria-label="Página siguiente">
+        <i-feather name="chevron-right" class="feather-sm"></i-feather>
+      </button>
+    </li>
+  </ul>
+</nav>

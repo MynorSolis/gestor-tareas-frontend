@@ -1,0 +1,20 @@
+<app-navbar 
+  *ngIf="showNavbarAndSidebar()" 
+  (sidebarToggled)="toggleSidebar()">
+</app-navbar>
+
+<div class="app-layout" *ngIf="showNavbarAndSidebar()">
+  <app-sidebar 
+    *ngIf="showNavbarAndSidebar()" 
+    #sidebar>
+  </app-sidebar>
+  
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+
+
+<div *ngIf="!showNavbarAndSidebar()">
+  <router-outlet></router-outlet>
+</div>

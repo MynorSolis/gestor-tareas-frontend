@@ -1,0 +1,136 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Estilos globales */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f8f9fa; 
+  color: #212529; 
+}
+
+
+.toast-success {
+  background-color: #198754; 
+}
+
+.toast-error {
+  background-color: #dc3545; 
+}
+
+
+.custom-card {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); 
+}
+
+
+.btn-custom-primary {
+  background-color: #0d6efd; 
+}
+
+.btn-custom-primary:hover {
+  background-color: #0b5ed7; 
+}
+
+
+.custom-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); 
+}
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  margin-top: 4rem;
+}
+
+.sidebar-container {
+  width: 16rem; 
+  flex-shrink: 0;
+}
+
+
+.main-content {
+  flex: 1 1 auto;
+  padding: 2rem 1rem;
+  background: #f8f9fa;
+  min-height: calc(100vh - 4rem);
+  margin-left: 16rem;
+  transition: margin-left 0.2s;
+}
+
+@media (max-width: 991.98px) {
+  .app-layout {
+    flex-direction: column;
+    margin-top: 3.5rem;
+  }
+  .sidebar-container {
+    width: 100%;
+    position: relative;
+    height: auto;
+  }
+  .main-content {
+    margin-left: 0;
+    padding: 1rem 0.5rem;
+  }
+}
+
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  margin-top: 4rem;
+}
+
+.sidebar-container {
+  width: 16rem; 
+  flex-shrink: 0;
+  transition: width 0.3s ease;
+}
+
+.main-content {
+  flex: 1 1 auto;
+  padding: 2rem 1rem;
+  background: #f8f9fa;
+  min-height: calc(100vh - 4rem);
+  margin-left: 16rem; 
+  transition: margin-left 0.3s ease;
+}
+
+@media (max-width: 991.98px) {
+  .app-layout {
+    flex-direction: row;
+    margin-top: 4rem;
+  }
+  
+  .sidebar-container {
+    width: 0;
+    overflow: hidden;
+  }
+  
+  .main-content {
+    margin-left: 0;
+    padding: 1.5rem 1rem;
+  }
+  
+
+  .sidebar-container.sidebar-visible {
+    width: 16rem;
+  }
+  
+  .sidebar-visible + .main-content {
+    margin-left: 16rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .sidebar-container.sidebar-visible {
+    width: 14rem;
+  }
+  
+  .sidebar-visible + .main-content {
+    margin-left: 14rem;
+  }
+  
+  .main-content {
+    padding: 1rem 0.75rem;
+  }
+}

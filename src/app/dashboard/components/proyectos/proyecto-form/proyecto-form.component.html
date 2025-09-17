@@ -1,0 +1,132 @@
+<div class="dashboard-container">
+  <!-- Encabezado -->
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">
+      {{ isEditMode ? 'Editar Proyecto' : 'Crear Nuevo Proyecto' }}
+    </h1>
+    <p class="dashboard-subtitle">
+      Completa el formulario para {{ isEditMode ? 'editar' : 'crear' }} un proyecto
+    </p>
+  </div>
+
+
+  <div class="form-card">
+    <form [formGroup]="proyectoForm" (ngSubmit)="onSubmit()">
+      <div class="form-section">
+        <h2 class="section-title">Información Básica</h2>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="nombre" class="form-label">Nombre *</label>
+              <input 
+                type="text" 
+                id="nombre" 
+                formControlName="nombre"
+                class="form-control"
+                placeholder="Nombre del proyecto"
+                [ngClass]="{ 'is-invalid': proyectoForm.get('nombre')?.invalid && proyectoForm.get('nombre')?.touched }">
+              <div *ngIf="proyectoForm.get('nombre')?.invalid && proyectoForm.get('nombre')?.touched" class="invalid-feedback">
+                <div *ngIf="proyectoForm.get('nombre')?.errors?.['required']">
+                  El nombre es requerido
+                </div>
+                <div *ngIf="proyectoForm.get('nombre')?.errors?.['maxlength']">
+                  El nombre no puede exceder los 100 caracteres
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="fechaLimite" class="form-label">Fecha Límite *</label>
+              <input 
+                type="date" 
+                id="fechaLimite" 
+                formControlName="fechaLimite"
+                class="form-control"
+                [ngClass]="{ 'is-invalid': proyectoForm.get('fechaLimite')?.invalid && proyectoForm.get('fechaLimite')?.touched }">
+              <div *ngIf="proyectoForm.get('fechaLimite')?.invalid && proyectoForm.get('fechaLimite')?.touched" class="invalid-feedback">
+                La fecha límite es requerida
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-group">
+          <label for="descripcion" class="form-label">Descripción</label>
+          <textarea 
+            id="descripcion" 
+            formControlName="descripcion"
+            rows="3"
+            class="form-control"
+            placeholder="Descripción detallada del proyecto"
+            [ngClass]="{ 'is-invalid': proyectoForm.get('descripcion')?.errors?.['maxlength'] }"></textarea>
+          <div *ngIf="proyectoForm.get('descripcion')?.errors?.['maxlength']" class="invalid-feedback">
+            La descripción no puede exceder los 500 caracteres
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2 class="section-title">Asignación</h2>
+        <div class="row g-3">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label class="form-label">Encargado del Proyecto</label>
+              <div *ngIf="!isEncargado; else encargadoView">
+                <select 
+                  id="encargadoId" 
+                  formControlName="encargadoId"
+                  class="form-select"
+                  [ngClass]="{ 'is-invalid': proyectoForm.get('encargadoId')?.invalid && proyectoForm.get('encargadoId')?.touched }">
+                  <option [ngValue]="null">Sin encargado</option>
+                  <option *ngFor="let encargado of encargados" [ngValue]="encargado.id">
+                    {{ encargado.username }} ({{ encargado.email }})
+                  </option>
+                </select>
+                <small class="form-text text-muted">Solo se muestran usuarios con rol ENCARGADO</small>
+              </div>
+              
+              <ng-template #encargadoView>
+                <div class="assigned-user-display">
+                  <i-feather name="user-check" class="feather-sm text-primary me-2"></i-feather>
+                  <span>
+                    {{ authService.currentUserValue?.username }} 
+                    <span class="text-muted">({{ authService.currentUserValue?.email }})</span>
+                  </span>
+                </div>
+                <input type="hidden" formControlName="encargadoId">
+                <small class="form-text text-muted">Estás asignado como encargado de este proyecto</small>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="button" 
+          (click)="navigateToProjects()"
+          class="btn btn-outline-secondary">
+          <i-feather name="x" class="feather-sm me-2"></i-feather>
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          [disabled]="proyectoForm.invalid || isLoading">
+          <span *ngIf="!isLoading">
+            <i-feather [name]="isEditMode ? 'save' : 'plus'" class="feather-sm me-2"></i-feather>
+            {{ isEditMode ? 'Actualizar' : 'Crear' }} Proyecto
+          </span>
+          <span *ngIf="isLoading">
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Guardando...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

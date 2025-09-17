@@ -1,0 +1,252 @@
+<div class="detalle-container">
+  <div class="detalle-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="detalle-title">{{ tarea?.titulo || 'Cargando...' }}</h1>
+        
+      </div>
+      <button 
+        (click)="cerrarDetalle()"
+        class="btn btn-secondary">
+        <i-feather name="x" class="feather-sm me-2"></i-feather>
+        Cerrar
+      </button>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="tarea">
+
+    <div class="col-lg-8">
+      <div class="detalle-card mb-4">
+        <h3 class="card-section-title">Información de la Tarea</h3>
+        
+        <div class="info-group">
+          <label class="info-label">Descripción:</label>
+          <p class="info-content">{{ tarea.descripcion }}</p>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="info-group">
+              <label class="info-label">Fecha de Creación:</label>
+              <p class="info-content">
+                <i-feather name="calendar" class="feather-xs me-2"></i-feather>
+                {{ tarea.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}
+              </p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="info-group">
+              <label class="info-label">Fecha Límite:</label>
+              <p class="info-content" [class.text-danger]="isFechaVencida(tarea.fechaLimite)">
+                <i-feather name="calendar" class="feather-xs me-2"></i-feather>
+                {{ tarea.fechaLimite | date:'dd/MM/yyyy' }}
+                <span *ngIf="isFechaVencida(tarea.fechaLimite)" class="badge bg-danger ms-2">Vencida</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="info-group">
+              <label class="info-label">Proyecto:</label>
+              <p class="info-content">
+                <span class="project-label">{{ tarea.proyectoNombre }}</span>
+              </p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="info-group">
+              <label class="info-label">Encargado de la tarea:</label>
+              <p class="info-content">
+                <i-feather name="user" class="feather-xs me-2"></i-feather>
+                {{ tarea.usuarioAsignadoUsername || 'No asignado' }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-group">
+          <label class="info-label">Estado:</label>
+          
+          <div *ngIf="puedeCambiarEstado(); else estadoSoloLectura">
+            <select 
+              [(ngModel)]="tarea.estado" 
+              (change)="cambiarEstado()"
+              class="form-select status-select-detalle"
+              [class]="'status-' + tarea.estado.toLowerCase().replace(' ', '-')">
+              <option value="Pendiente">Pendiente</option>
+              <option value="En progreso">En progreso</option>
+              <option value="Completada">Completada</option>
+            </select>
+          </div>
+          
+          <ng-template #estadoSoloLectura>
+            <span class="status-badge"
+              [class]="'status-' + tarea.estado.toLowerCase().replace(' ', '-')">
+              {{ tarea.estado }}
+            </span>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Comentarios -->
+      <div class="detalle-card">
+        <h3 class="card-section-title">
+          Comentarios
+          <span class="badge bg-secondary ms-2" *ngIf="comentarios.length > 0">
+            {{ comentarios.length }}
+          </span>
+        </h3>
+        
+        <div class="comentarios-lista mb-4" *ngIf="comentarios.length > 0" #comentariosContainer>
+          <div *ngFor="let comentario of comentarios; let ultimo = last" 
+              class="comentario-item"
+              [class.comentario-reciente]="ultimo">
+            <div class="comentario-header">
+              <div class="comentario-info">
+                <span class="comentario-autor">{{ comentario.autor }}</span>
+                <span class="comentario-fecha">{{ comentario.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              <div class="comentario-acciones" *ngIf="puedeEliminarComentario(comentario)">
+                <button 
+                  (click)="eliminarComentario(comentario)"
+                  class="btn-action btn-delete-comment"
+                  title="Eliminar comentario">
+                  <i-feather name="trash-2" class="feather-xs"></i-feather>
+                </button>
+              </div>
+            </div>
+            <p class="comentario-texto">{{ comentario.texto }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="comentarios.length === 0" class="text-muted text-center py-3">
+          <i-feather name="message-circle" class="feather-sm me-2"></i-feather>
+          No hay comentarios aún. ¡Sé el primero en comentar!
+        </div>
+
+        <div class="agregar-comentario" *ngIf="puedeAgregarComentarios()">
+          <label class="form-label">Agregar comentario:</label>
+          <textarea 
+            [(ngModel)]="nuevoComentario"
+            class="form-control mb-3"
+            rows="3"
+            placeholder="Escribe tu comentario aquí..."
+            maxlength="1000"></textarea>
+          
+          <div class="d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+              {{ nuevoComentario.length }}/1000 caracteres
+            </small>
+            <button 
+              (click)="agregarComentario()"
+              [disabled]="!nuevoComentario.trim()"
+              class="btn btn-primary">
+              <i-feather name="message-circle" class="feather-sm me-2"></i-feather>
+              Agregar Comentario
+            </button>
+          </div>
+        </div>
+
+        <div class="alert alert-info" *ngIf="!puedeAgregarComentarios()">
+          <i-feather name="info" class="feather-sm me-2"></i-feather>
+          Inicia sesión para poder agregar comentarios
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel lateral -->
+    <div class="col-lg-4">
+      
+      <div class="detalle-card mb-4" *ngIf="puedeSubirArchivos()">
+        <h3 class="card-section-title">Subir Archivo</h3>
+        <div class="upload-section">
+          <input 
+            type="file" 
+            #fileInput 
+            (change)="onFileSelected($event)"
+            class="d-none"
+            multiple
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.txt">
+          <button 
+            (click)="fileInput.click()"
+            class="btn btn-outline-primary w-100 mb-3">
+            <i-feather name="upload" class="feather-sm me-2"></i-feather>
+            Seleccionar Archivos
+          </button>
+          
+          <div *ngIf="archivosSeleccionados.length > 0" class="archivos-seleccionados mb-3">
+            <div *ngFor="let archivo of archivosSeleccionados" class="archivo-item">
+              <span class="archivo-nombre">{{ archivo.name }}</span>
+              <span class="archivo-tamaño">({{ archivo.size | fileSize }})</span>
+              <button 
+                (click)="removerArchivo(archivo)"
+                class="btn-remove">
+                <i-feather name="x" class="feather-xs"></i-feather>
+              </button>
+            </div>
+          </div>
+
+          <button 
+            (click)="subirArchivos()"
+            [disabled]="archivosSeleccionados.length === 0 || subiendoArchivo"
+            class="btn btn-success w-100">
+            <span *ngIf="subiendoArchivo" class="spinner-border spinner-border-sm me-2"></span>
+            <i-feather *ngIf="!subiendoArchivo" name="upload-cloud" class="feather-sm me-2"></i-feather>
+            {{ subiendoArchivo ? 'Subiendo...' : 'Subir Archivos' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="detalle-card" *ngIf="puedeVerArchivos()">
+        <h3 class="card-section-title">Archivos de la Tarea</h3>
+        
+        <div *ngIf="archivos.length > 0" class="archivos-lista">
+          <div *ngFor="let archivo of archivos" class="archivo-existente">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center">
+                <i-feather [name]="obtenerIconoArchivo(archivo.nombre)" class="feather-sm me-2"></i-feather>
+                <span class="archivo-nombre">{{ archivo.nombre }}</span>
+              </div>
+              <div class="archivo-acciones">
+                <button 
+                  *ngIf="puedeDescargarArchivos()"
+                  (click)="descargarArchivo(archivo)"
+                  class="btn-action btn-download"
+                  title="Descargar archivo">
+                  <i-feather name="download" class="feather-xs"></i-feather>
+                </button>
+                
+                <button 
+                  *ngIf="puedeEliminarArchivo(archivo)"
+                  (click)="eliminarArchivo(archivo)"
+                  class="btn-action btn-delete"
+                  title="Eliminar archivo">
+                  <i-feather name="trash-2" class="feather-xs"></i-feather>
+                </button>
+              </div>
+            </div>
+            <div class="archivo-info">
+              <small class="text-muted">
+                Subido por {{ archivo.subidoPor }} - {{ archivo.fechaSubida | date:'dd/MM/yyyy HH:mm' }}
+              </small>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="archivos.length === 0" class="text-muted text-center py-3">
+          No hay archivos adjuntos
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div *ngIf="!tarea" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+</div>

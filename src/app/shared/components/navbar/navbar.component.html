@@ -1,0 +1,43 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <button class="navbar-toggler d-lg-none" (click)="toggleSidebar()">
+      <i-feather name="menu" class="feather-lg"></i-feather>
+    </button>
+
+    <div class="navbar-brand">
+      <a class="navbar-logo" [routerLink]="['/dashboard']">
+        <div class="logo-icon">
+          <i-feather name="check-circle" class="feather-lg"></i-feather>
+        </div>
+        <span class="logo-text">TaskApp</span>
+      </a>
+    </div>
+
+    <div class="navbar-user" *ngIf="authService.isLoggedIn()">
+      <div class="dropdown" ngbDropdown #dropdown="ngbDropdown" [autoClose]="'outside'">
+        <button class="user-toggle" ngbDropdownToggle>
+          <div class="user-avatar">
+            {{ currentUser?.username?.charAt(0)?.toUpperCase() }}
+          </div>
+          <div class="user-info">
+            <div class="user-name">{{ currentUser?.username }}</div>
+            <div class="user-role">{{ getRoleName(currentUser?.roles?.[0]) }}</div>
+          </div>
+          <i-feather name="chevron-down" class="feather-xs dropdown-arrow"></i-feather>
+        </button>
+
+        <div class="dropdown-menu" ngbDropdownMenu>
+          <a ngbDropdownItem (click)="toggleEditModal()">
+            <i-feather name="user" class="feather-sm me-2"></i-feather>
+            Mi Perfil
+          </a>
+          <div class="dropdown-divider"></div>
+          <a ngbDropdownItem (click)="logout()">
+            <i-feather name="log-out" class="feather-sm me-2"></i-feather>
+            Cerrar sesión
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

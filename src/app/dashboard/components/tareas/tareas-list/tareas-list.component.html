@@ -1,0 +1,353 @@
+<div class="dashboard-container">
+
+  <div class="dashboard-header">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h1 class="dashboard-title">Tareas</h1>
+        <p class="dashboard-subtitle">Administra tus tareas asignadas</p>
+      </div>
+      <button *ngIf="authService.isEncargado() || authService.isAdmin()" [routerLink]="['/dashboard/tareas/nueva']"
+        class="btn btn-primary d-flex align-items-center shadow-sm">
+        <i-feather name="plus" class="feather-sm me-2"></i-feather>
+        Nueva Tarea
+      </button>
+    </div>
+  </div>
+
+
+  <div class="filter-section mb-4">
+    <div class="filter-tabs">
+      <button (click)="filtrarTareasPorEstado('todas')" [class.active]="filtroEstado === 'todas'" class="filter-tab">
+        <span>Todas</span>
+        <span class="badge bg-light text-dark ms-2">{{ tareas.length }}</span>
+      </button>
+      <button (click)="filtrarTareasPorEstado('Pendiente')" [class.active]="filtroEstado === 'Pendiente'"
+        class="filter-tab">
+        <span>Pendientes</span>
+        <span class="badge bg-warning-light text-warning ms-2">{{ contarTareasPorEstado('Pendiente') }}</span>
+      </button>
+      <button (click)="filtrarTareasPorEstado('En progreso')" [class.active]="filtroEstado === 'En progreso'"
+        class="filter-tab">
+        <span>En progreso</span>
+        <span class="badge bg-info-light text-info ms-2">{{ contarTareasPorEstado('En progreso') }}</span>
+      </button>
+      <button (click)="filtrarTareasPorEstado('Completada')" [class.active]="filtroEstado === 'Completada'"
+        class="filter-tab">
+        <span>Completadas</span>
+        <span class="badge bg-success-light text-success ms-2">{{ contarTareasPorEstado('Completada') }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Vista para ADMINISTRADOR -->
+  <div *ngIf="authService.isAdmin()" class="tasks-card">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="card-title">Lista de Tareas</h2>
+        <div class="text-muted small">
+          Mostrando {{ getDisplayRange() }}
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="tasks-table">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Proyecto</th>
+            <th>Asignado a</th>
+            <th>Estado</th>
+            <th>Prioridad</th>
+            <th>Fecha Límite</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="isLoading">
+            <td [attr.colspan]="7" class="text-center py-5">
+              <div class="d-flex justify-content-center">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Cargando...</span>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngFor="let tarea of tareasFiltradas" class="task-row">
+            <td>
+              <div class="task-title">{{ tarea.titulo }}</div>
+              <div class="task-description">{{ tarea.descripcion | truncate:50 }}</div>
+            </td>
+            <td>
+              <div class="project-name">{{ tarea.proyectoNombre }}</div>
+              <div class="project-manager" *ngIf="tarea.encargadoProyecto">
+                <i-feather name="user" class="feather-xs me-1"></i-feather>
+                {{ tarea.encargadoProyecto.username }}
+              </div>
+              <div class="text-muted small" *ngIf="!tarea.encargadoProyecto">
+                Sin encargado
+              </div>
+            </td>
+            <td>
+              <div class="assigned-user">
+                <span *ngIf="tarea.usuarioAsignadoUsername; else unassigned">
+                  <i-feather name="user-check" class="feather-xs me-1"></i-feather>
+                  {{ tarea.usuarioAsignadoUsername }}
+                </span>
+                <ng-template #unassigned>
+                  <span class="text-muted">No asignado</span>
+                </ng-template>
+              </div>
+            </td>
+            <td>
+              <div *ngIf="puedeCambiarEstado(tarea); else soloLectura">
+                <select [(ngModel)]="tarea.estado" (change)="cambiarEstadoTarea(tarea.id, tarea.estado)"
+                  class="status-select" [class.status-pending]="tarea.estado === 'Pendiente'"
+                  [class.status-progress]="tarea.estado === 'En progreso'"
+                  [class.status-completed]="tarea.estado === 'Completada'">
+                  <option value="Pendiente">Pendiente</option>
+                  <option value="En progreso">En progreso</option>
+                  <option value="Completada">Completada</option>
+                </select>
+              </div>
+              <ng-template #soloLectura>
+                <span class="status-badge" [class.status-pending]="tarea.estado === 'Pendiente'"
+                  [class.status-progress]="tarea.estado === 'En progreso'"
+                  [class.status-completed]="tarea.estado === 'Completada'">
+                  {{ tarea.estado }}
+                </span>
+              </ng-template>
+            </td>
+            <td>
+              <span class="priority-badge" [class.priority-high]="tarea.prioridad === 'Alta'"
+                [class.priority-medium]="tarea.prioridad === 'Media'" [class.priority-low]="tarea.prioridad === 'Baja'">
+                <i-feather
+                  [name]="tarea.prioridad === 'Alta' ? 'alert-triangle' : (tarea.prioridad === 'Media' ? 'alert-circle' : 'info')"
+                  class="feather-xs me-1"></i-feather>
+                {{ tarea.prioridad }}
+              </span>
+            </td>
+            <td>
+              <div class="due-date" [class.overdue]="isFechaVencida(tarea.fechaLimite)">
+                <i-feather name="calendar" class="feather-xs me-1"></i-feather>
+                {{ tarea.fechaLimite | date:'dd/MM/yyyy' }}
+                <span *ngIf="isFechaVencida(tarea.fechaLimite)" class="badge bg-danger ms-2">Vencido</span>
+              </div>
+            </td>
+            <td class="text-end">
+              <div class="actions">
+
+                <button (click)="verTarea(tarea.id)" class="btn-action btn-view tooltip-container">
+                  <i-feather name="eye" class="feather-sm"></i-feather>
+                  <span class="tooltip-text">Ver tarea</span>
+                </button>
+
+                <button [routerLink]="['/dashboard/tareas', tarea.id]" class="btn-action btn-edit tooltip-container">
+                  <i-feather name="edit" class="feather-sm"></i-feather>
+                  <span class="tooltip-text">Modificar</span>
+                </button>
+                <button (click)="eliminarTarea(tarea.id)" class="btn-action btn-delete tooltip-container"
+                  [disabled]="isDeleting === tarea.id">
+                  <i-feather *ngIf="isDeleting !== tarea.id" name="trash-2" class="feather-sm"></i-feather>
+                  <span *ngIf="isDeleting === tarea.id" class="spinner-border spinner-border-sm" role="status"></span>
+                  <span class="tooltip-text">Eliminar</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="!isLoading && tareasFiltradas.length === 0">
+            <td [attr.colspan]="7" class="text-center py-4">
+              <div class="empty-state">
+                <i-feather name="inbox" class="feather-lg mb-2"></i-feather>
+                <p>No se encontraron tareas</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <div class="card-footer">
+      <app-pagination [currentPage]="currentPage" [itemsPerPage]="itemsPerPage" [totalItems]="totalFilteredItems"
+        (pageChange)="onPageChange($event)">
+      </app-pagination>
+    </div>
+  </div>
+
+  <!-- Vista para ENCARGADO -->
+  <div *ngIf="authService.isEncargado()">
+    <div *ngIf="tareasAsignadasFiltradas.length > 0" class="mb-5">
+      <h3 class="section-title mb-4">Mis Tareas Asignadas</h3>
+      <div class="tasks-grid">
+        <div *ngFor="let tarea of tareasAsignadasFiltradas" class="task-card">
+          <div class="task-card-header">
+            <h4 class="task-title">{{ tarea.titulo }}</h4>
+            <span class="task-priority" [class]="'priority-' + tarea.prioridad.toLowerCase()">
+              {{ tarea.prioridad }}
+            </span>
+          </div>
+
+          <p class="task-description">{{ tarea.descripcion | truncate:100 }}</p>
+
+          <div class="task-project">
+            <span class="project-label">Proyecto:</span>
+            <span class="project-name">{{ tarea.proyectoNombre }}</span>
+          </div>
+
+          <div class="task-status" [class]="'status-' + tarea.estado.toLowerCase().replace(' ', '-')">
+            {{ tarea.estado }}
+          </div>
+
+          <div class="task-due-date" [class.overdue]="isFechaVencida(tarea.fechaLimite)">
+            <i-feather name="calendar" class="feather-xs me-1"></i-feather>
+            {{ tarea.fechaLimite | date:'dd/MM/yyyy' }}
+            <span *ngIf="isFechaVencida(tarea.fechaLimite)" class="badge bg-danger ms-2">Vencido</span>
+          </div>
+
+          <div class="task-actions">
+            <button (click)="verTarea(tarea.id)" class="btn btn-view-task mb-2">
+              <i-feather name="eye" class="feather-sm me-2"></i-feather>
+              Ver Tarea
+            </button>
+
+
+            <div class="d-flex justify-content-end gap-2 w-100">
+              <div class="tooltip-container" *ngIf="puedeEditarTarea(tarea)">
+                <button (click)="editarTarea(tarea.id)" class="btn-action btn-edit"
+                  [disabled]="isDeleting === tarea.id">
+                  <i-feather name="edit" class="feather-sm"></i-feather>
+                  <span class="tooltip-text">Editar tarea</span>
+                </button>
+              </div>
+
+              <div class="tooltip-container" *ngIf="puedeEliminarTarea(tarea)">
+                <button (click)="eliminarTarea(tarea.id)" class="btn-action btn-delete"
+                  [disabled]="isDeleting === tarea.id">
+                  <i-feather *ngIf="isDeleting !== tarea.id" name="trash-2" class="feather-sm"></i-feather>
+                  <span *ngIf="isDeleting === tarea.id" class="spinner-border spinner-border-sm" role="status"></span>
+                  <span class="tooltip-text">Eliminar tarea</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tareas de proyectos asignados -->
+    <div *ngIf="tareasProyectosAsignadosFiltradas.length > 0">
+      <h3 class="section-title mb-4">Tareas de Mis Proyectos</h3>
+      <div class="tasks-grid">
+        <div *ngFor="let tarea of tareasProyectosAsignadosFiltradas" class="task-card">
+          <div class="task-card-header">
+            <h4 class="task-title">{{ tarea.titulo }}</h4>
+            <span class="task-priority" [class]="'priority-' + tarea.prioridad.toLowerCase()">
+              {{ tarea.prioridad }}
+            </span>
+          </div>
+
+          <p class="task-description">{{ tarea.descripcion | truncate:100 }}</p>
+
+          <div class="task-project">
+            <span class="project-label">Proyecto:</span>
+            <span class="project-name">{{ tarea.proyectoNombre }}</span>
+          </div>
+
+          <div class="task-assignee">
+            <i-feather name="user" class="feather-xs me-1"></i-feather>
+            {{ tarea.usuarioAsignadoUsername || 'No asignado' }}
+          </div>
+
+          <div class="task-status" [class]="'status-' + tarea.estado.toLowerCase().replace(' ', '-')">
+            {{ tarea.estado }}
+          </div>
+
+          <div class="task-due-date" [class.overdue]="isFechaVencida(tarea.fechaLimite)">
+            <i-feather name="calendar" class="feather-xs me-1"></i-feather>
+            {{ tarea.fechaLimite | date:'dd/MM/yyyy' }}
+            <span *ngIf="isFechaVencida(tarea.fechaLimite)" class="badge bg-danger ms-2">Vencido</span>
+          </div>
+
+          <div class="task-actions">
+
+            <button (click)="verTarea(tarea.id)" class="btn btn-view-task mb-2">
+              <i-feather name="eye" class="feather-sm me-2"></i-feather>
+              Ver Tarea
+            </button>
+
+            <div class="d-flex justify-content-end gap-2 w-100">
+              <div class="tooltip-container" *ngIf="puedeEditarTarea(tarea)">
+                <button (click)="editarTarea(tarea.id)" class="btn-action btn-edit"
+                  [disabled]="isDeleting === tarea.id">
+                  <i-feather name="edit" class="feather-sm"></i-feather>
+                  <span class="tooltip-text">Editar tarea</span>
+                </button>
+              </div>
+
+              <div class="tooltip-container" *ngIf="puedeEliminarTarea(tarea)">
+                <button (click)="eliminarTarea(tarea.id)" class="btn-action btn-delete"
+                  [disabled]="isDeleting === tarea.id">
+                  <i-feather *ngIf="isDeleting !== tarea.id" name="trash-2" class="feather-sm"></i-feather>
+                  <span *ngIf="isDeleting === tarea.id" class="spinner-border spinner-border-sm" role="status"></span>
+                  <span class="tooltip-text">Eliminar tarea</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensaje cuando no hay tareas -->
+    <div *ngIf="tareasAsignadasFiltradas.length === 0 && tareasProyectosAsignadosFiltradas.length === 0"
+      class="empty-state">
+      <i-feather name="inbox" class="feather-lg mb-2"></i-feather>
+      <p>No se encontraron tareas asignadas</p>
+    </div>
+  </div>
+
+  <!-- Vista para USUARIO NORMAL -->
+  <div *ngIf="authService.isUser()">
+    <div *ngIf="tareasFiltradas.length > 0" class="tasks-grid">
+      <div *ngFor="let tarea of tareasFiltradas" class="task-card">
+        <div class="task-card-header">
+          <h4 class="task-title">{{ tarea.titulo }}</h4>
+          <span class="task-priority" [class]="'priority-' + tarea.prioridad.toLowerCase()">
+            {{ tarea.prioridad }}
+          </span>
+        </div>
+
+        <p class="task-description">{{ tarea.descripcion | truncate:100 }}</p>
+
+        <div class="task-project">
+          <span class="project-label">Proyecto:</span>
+          <span class="project-name">{{ tarea.proyectoNombre }}</span>
+        </div>
+
+        <div class="task-status" [class]="'status-' + tarea.estado.toLowerCase().replace(' ', '-')">
+          {{ tarea.estado }}
+        </div>
+
+        <div class="task-due-date" [class.overdue]="isFechaVencida(tarea.fechaLimite)">
+          <i-feather name="calendar" class="feather-xs me-1"></i-feather>
+          {{ tarea.fechaLimite | date:'dd/MM/yyyy' }}
+          <span *ngIf="isFechaVencida(tarea.fechaLimite)" class="badge bg-danger ms-2">Vencido</span>
+        </div>
+
+        <div class="task-actions">
+          <button (click)="verTarea(tarea.id)" class="btn btn-view-task">
+            <i-feather name="eye" class="feather-sm me-2"></i-feather>
+            Ver Tarea
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="tareasFiltradas.length === 0" class="empty-state">
+      <i-feather name="inbox" class="feather-lg mb-2"></i-feather>
+      <p>No se encontraron tareas asignadas</p>
+    </div>
+  </div>

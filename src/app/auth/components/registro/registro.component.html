@@ -1,0 +1,116 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header text-center mb-5">
+      <img class="login-logo" src="assets/logo.png" alt="TaskApp">
+      <h1 class="login-title">TaskApp</h1>
+      <p class="login-subtitle">Crea una nueva cuenta</p>
+    </div>
+
+    <form [formGroup]="registroForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group mb-4">
+        <label for="username" class="form-label">Nombre de usuario</label>
+        <input
+          id="username"
+          formControlName="username"
+          type="text"
+          class="form-control input-field"
+          placeholder="Ingresa tu usuario"
+          required>
+        <div *ngIf="registroForm.get('username')?.invalid && registroForm.get('username')?.touched" 
+             class="form-error">
+          <i class="bi bi-exclamation-circle"></i>
+          <span *ngIf="registroForm.get('username')?.errors?.['required']">Nombre de usuario requerido</span>
+          <span *ngIf="registroForm.get('username')?.errors?.['minlength']">Debe tener al menos 3 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group mb-4">
+        <label for="email" class="form-label">Email</label>
+        <input
+          id="email"
+          formControlName="email"
+          type="email"
+          class="form-control input-field"
+          placeholder="Ingresa tu email"
+          required>
+        <div *ngIf="registroForm.get('email')?.invalid && registroForm.get('email')?.touched" 
+             class="form-error">
+          <i class="bi bi-exclamation-circle"></i>
+          <span *ngIf="registroForm.get('email')?.errors?.['required']">Email requerido</span>
+          <span *ngIf="registroForm.get('email')?.errors?.['email']">Por favor ingresa un email válido</span>
+        </div>
+      </div>
+
+      <div class="form-group mb-4">
+        <label for="password" class="form-label">Contraseña</label>
+        <div class="password-input">
+          <input
+            id="password"
+            formControlName="password"
+            [type]="showPassword ? 'text' : 'password'"
+            class="form-control input-field"
+            placeholder="Ingresa tu contraseña"
+            required>
+          <button
+            class="password-toggle"
+            type="button"
+            (click)="togglePasswordVisibility('password')">
+            <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+          </button>
+        </div>
+        <div *ngIf="registroForm.get('password')?.invalid && registroForm.get('password')?.touched" 
+             class="form-error">
+          <i class="bi bi-exclamation-circle"></i>
+          <span *ngIf="registroForm.get('password')?.errors?.['required']">Contraseña requerida</span>
+          <span *ngIf="registroForm.get('password')?.errors?.['minlength']">Debe tener al menos 6 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group mb-4">
+        <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
+        <div class="password-input">
+          <input
+            id="confirmPassword"
+            formControlName="confirmPassword"
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            class="form-control input-field"
+            placeholder="Confirma tu contraseña"
+            required>
+          <button
+            class="password-toggle"
+            type="button"
+            (click)="togglePasswordVisibility('confirmPassword')">
+            <i class="bi" [class.bi-eye]="!showConfirmPassword" [class.bi-eye-slash]="showConfirmPassword"></i>
+          </button>
+        </div>
+        <div *ngIf="registroForm.get('confirmPassword')?.invalid && registroForm.get('confirmPassword')?.touched" 
+             class="form-error">
+          <i class="bi bi-exclamation-circle"></i>
+          <span *ngIf="registroForm.get('confirmPassword')?.errors?.['required']">Confirmación de contraseña requerida</span>
+        </div>
+        <div *ngIf="registroForm.errors?.['mismatch'] && registroForm.get('confirmPassword')?.touched" 
+             class="form-error">
+          <i class="bi bi-exclamation-circle"></i> Las contraseñas no coinciden
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        class="btn login-btn w-100"
+        [disabled]="registroForm.invalid || isLoading">
+        <span *ngIf="!isLoading">Registrarse</span>
+        <span *ngIf="isLoading">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Cargando...
+        </span>
+      </button>
+    </form>
+
+    <div class="login-footer text-center mt-4">
+      <p class="register-text">
+        ¿Ya tienes una cuenta? 
+        <a [routerLink]="['/auth/login']" class="register-link">Inicia sesión</a>
+      </p>
+    </div>
+  </div>
+</div>
